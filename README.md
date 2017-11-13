@@ -1,5 +1,5 @@
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
-
+![](https://travis-ci.org/xujuvenile/promise-simulation.svg?branch=test-ci)
 
 # Promise-Simulation
 
