@@ -164,4 +164,74 @@ Promise.deferred = Promise.defer = function () {
   }
 }
 
+/**
+ * http://www.ecma-international.org/ecma-262/6.0/#sec-promise.resolve
+ * @param value: promise/thenable/other value type likes null/number..
+ */
+Promise.resolve = function (value) {
+  return new Promise((resolve, reject) => {
+    return resolve(value)
+  })
+}
+
+Promise.reject = function (reason) {
+  return new Promise((resolve, reject) => {
+    return reject(reason)
+  })
+}
+
+/**
+ * in promise values, if anyone value status trans to resolve or reject, then return thispromise.resolve/reject
+ * @param values
+ * @return {Promise}
+ */
+Promise.race = function (values) {
+  return new Promise(function (resolve, reject) {
+    values.forEach(function (value) {
+      Promise.resolve(value).then(resolve, reject)
+    })
+  })
+}
+
+Promise.delay = function (ms) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve(), ms * 1000)
+  })
+}
+
+/**
+ * 生成并返回一个新的promise对象。
+ * 参数传递promise数组中所有的promise对象都变为resolve的时候，该方法才会返回， 新创建的promise则会使用这些promise的值。
+ * 如果参数中的任何一个promise为reject的话，则整个Promise.all调用会立即终止，并返回一个reject的新的promise对象。
+ * @param values
+ */
+Promise.all = function (values) {
+  if (!Array.isArray(values)) throw new TypeError('values should be an array')
+  if (values.length === 0) return Promise.resolve(values)
+
+  return new Promise((resolve, reject) => {
+    let remains = values.length
+
+    function res (idx, val) {
+      let then = getThen(val)
+      if (then) {
+        let p = new Promise(then.bind(val))
+        p.then(function (val) {
+          res(idx, val)
+        }, reject)
+        return
+      }
+
+      values[idx] = val
+      if (--remains === 0) {
+        resolve(values)
+      }
+    }
+
+    for (let i = 0; i < values.length; i++) {
+      res(i, values[i])
+    }
+  })
+}
+
 module.exports = Promise
