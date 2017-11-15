@@ -1,7 +1,6 @@
 const PENDING = Symbol('PENDING')
 const FULFILLED = Symbol('FULFILLED')
 const REJECTED = Symbol('REJECTED')
-const assert = require('assert')
 
 function Promise (fn) {
   // state enum: [PENDING, FULFILLED , REJECTED]
@@ -207,7 +206,32 @@ Promise.delay = function (ms) {
  * @param values
  */
 Promise.all = function (values) {
-  if (!Array.isArray(values)) return Promise.reject(TypeError('values should be an array'))
+  if (!Array.isArray(values)) throw new TypeError('values should be an array')
+  if (values.length === 0) return Promise.resolve(values)
+
+  return new Promise((resolve, reject) => {
+    let remains = values.length
+
+    function res (idx, val) {
+      let then = getThen(val)
+      if (then) {
+        let p = new Promise(then.bind(val))
+        p.then(function (val) {
+          res(idx, val)
+        }, reject)
+        return
+      }
+
+      values[idx] = val
+      if (--remains === 0) {
+        resolve(values)
+      }
+    }
+
+    for (let i = 0; i < values.length; i++) {
+      res(i, values[i])
+    }
+  })
 }
 
 module.exports = Promise

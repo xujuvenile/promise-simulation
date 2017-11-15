@@ -16,7 +16,7 @@
   },
   "standard": {
     "globals": [
-      "describe"
+      "describe","it"
     ]
   }
 }
