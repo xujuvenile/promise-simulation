@@ -23,7 +23,7 @@ This creates and returns a new promise.  `resolver` must be a function.  The `re
 
 These methods are invoked on a promise instance by calling `myPromise.methodName`
 
-### Promise#then(onFulfilled, onRejected)
+#### Promise#then(onFulfilled, onRejected)
 
 #### Promise#catch(onRejected)
 
